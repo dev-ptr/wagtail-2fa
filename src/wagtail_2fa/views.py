@@ -62,7 +62,7 @@ class LoginView(RedirectURLMixin, FormView):
         )
         url_is_safe = url_has_allowed_host_and_scheme(
             url=redirect_to,
-            allowed_hosts=self.get_success_url_allowed_hosts(),
+            allowed_hosts=None,
             require_https=self.request.is_secure(),
         )
         return redirect_to if url_is_safe else ""
