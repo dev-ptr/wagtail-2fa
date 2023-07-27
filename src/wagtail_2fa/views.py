@@ -33,6 +33,7 @@ class LoginView(RedirectURLMixin, FormView):
         template_name = "wagtail_2fa/otp_form.html"
     else:
         template_name = "wagtail_2fa/legacy/otp_form.html"
+    template_name = "wagtail_2fa/legacy/otp_form.html"
     form_class = forms.TokenForm
     redirect_field_name = REDIRECT_FIELD_NAME
 
