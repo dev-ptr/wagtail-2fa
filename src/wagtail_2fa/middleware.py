@@ -10,11 +10,11 @@ from django_otp.middleware import OTPMiddleware as _OTPMiddleware
 
 class VerifyUserMiddleware(_OTPMiddleware):
     _allowed_url_names = [
+        "wagtailadmin_sprite",
         "wagtail_2fa_auth",
         "wagtailadmin_login",
         "wagtailadmin_logout",
         "wagtailadmin_javascript_catalog",
-        "wagtailadmin_sprite",
     ]
 
     # These URLs do not require verification if the user has no devices
