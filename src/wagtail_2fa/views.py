@@ -29,52 +29,22 @@ from wagtail_2fa.mixins import OtpRequiredMixin
 
 
 class LoginView(RedirectURLMixin, FormView):
+    if WAGTAIL_VERSION >= (4, 0, 0):
+        template_name = "wagtail_2fa/otp_form.html"
+    else:
+        template_name = "wagtail_2fa/legacy/otp_form.html"
+
     form_class = forms.TokenForm
     redirect_field_name = REDIRECT_FIELD_NAME
-
-    @method_decorator(sensitive_post_parameters())
-    @method_decorator(never_cache)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
 
-    @property
-    def template_name(self):
-        if WAGTAIL_VERSION >= (4, 0, 0):
-            template_name = "wagtail_2fa/otp_form.html"
-        else:
-            template_name = "wagtail_2fa/legacy/otp_form.html"
-        return template_name
-
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context[self.redirect_field_name] = self.get_redirect_url()
-        return context
-
     def form_valid(self, form):
         otp_login(self.request, self.request.user.otp_device)
         return super().form_valid(form)
-
-    def get_redirect_url(self):
-        """Return the user-originating redirect URL if it's safe."""
-        redirect_to = self.request.POST.get(
-            self.redirect_field_name, self.request.GET.get(self.redirect_field_name, "")
-        )
-        url_is_safe = url_has_allowed_host_and_scheme(
-            url=redirect_to,
-            allowed_hosts=self.get_success_url_allowed_hosts(),
-            require_https=self.request.is_secure(),
-        )
-        return redirect_to if url_is_safe else ""
-
-    def get_success_url(self):
-        url = self.get_redirect_url()
-        return url or resolve_url(settings.LOGIN_REDIRECT_URL)
 
 
 class DeviceListView(OtpRequiredMixin, ListView):
