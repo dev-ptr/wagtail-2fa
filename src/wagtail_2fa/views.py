@@ -29,11 +29,6 @@ from wagtail_2fa.mixins import OtpRequiredMixin
 
 
 class LoginView(RedirectURLMixin, FormView):
-    if WAGTAIL_VERSION >= (4, 0, 0):
-        template_name = "wagtail_2fa/otp_form.html"
-    else:
-        template_name = "wagtail_2fa/legacy/otp_form.html"
-    template_name = "wagtail_2fa/otp_form.html"
     form_class = forms.TokenForm
     redirect_field_name = REDIRECT_FIELD_NAME
 
@@ -46,6 +41,15 @@ class LoginView(RedirectURLMixin, FormView):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+
+    @property
+    def template_name(self):
+        if WAGTAIL_VERSION >= (4, 0, 0):
+            template_name = "wagtail_2fa/otp_form.html"
+        else:
+            template_name = "wagtail_2fa/legacy/otp_form.html"
+        return template_name
+
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
